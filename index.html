@@ -3,47 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Washinghton Campos | Portfólio</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Meu Site</title>
+
+    <style>
+        :root {
+            --azul-escuro: #0a2540;
+            --azul-medio: #1f4fd8;
+            --cinza-claro: #f4f6f8;
+            --texto: #1a1a1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--texto);
+            background-color: var(--cinza-claro);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--azul-escuro);
+            padding: 20px;
+        }
+
+        nav {
+            max-width: 1000px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav h1 {
+            color: #fff;
+            font-size: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        section {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        section h2 {
+            color: var(--azul-escuro);
+            margin-bottom: 15px;
+        }
+
+        .projetos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        footer {
+            background-color: var(--azul-escuro);
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            font-size: 14px;
+        }
+
+        a.email {
+            color: var(--azul-medio);
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        a.email:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
+
 <body>
 
 <header>
-    <h1>Washinghton Campos</h1>
-    <p>Advogado | Estudante de Análise e Desenvolvimento de Sistemas</p>
+    <nav>
+        <h1>Meu Site</h1>
+        <ul>
+            <li><a href="#sobre">Sobre</a></li>
+            <li><a href="#projetos">Projetos</a></li>
+            <li><a href="#contato">Contato</a></li>
+        </ul>
+    </nav>
 </header>
-
-<nav>
-    <a href="#sobre">Sobre</a>
-    <a href="#projetos">Projetos</a>
-    <a href="#contato">Contato</a>
-</nav>
 
 <section id="sobre">
     <h2>Sobre</h2>
     <p>
-        Profissional do Direito em transição estratégica para tecnologia, com foco em
-        automação, APIs, engenharia de dados e soluções orientadas a eficiência.
+        Este site apresenta meus projetos e informações profissionais.
+        O foco é simplicidade, clareza e organização.
     </p>
 </section>
 
 <section id="projetos">
     <h2>Projetos</h2>
 
-    <div class="card">
-        <h3>Conversor / Extrator SIAPE</h3>
-        <p>Aplicação em Python para tratamento e transformação de grandes volumes de dados.</p>
-        <a href="https://github.com/SEU_USUARIO/SEU_REPOSITORIO" target="_blank">
-            Ver no GitHub
-        </a>
-    </div>
+    <div class="projetos">
+        <div class="card">
+            <h3>Projeto 1</h3>
+            <p>Descrição curta do projeto.</p>
+        </div>
 
-    <div class="card">
-        <h3>Automação WhatsApp (API)</h3>
-        <p>Integração com APIs WhatsApp (WAHA / Evolution) usando workflows e Python.</p>
+        <div class="card">
+            <h3>Projeto 2</h3>
+            <p>Descrição curta do projeto.</p>
+        </div>
+
+        <div class="card">
+            <h3>Projeto 3</h3>
+            <p>Descrição curta do projeto.</p>
+        </div>
     </div>
 </section>
 
 <section id="contato">
     <h2>Contato</h2>
     <p>
+        Entre em contato pelo e-mail:
+        <a class="email" href="mailto:seuemail@email.com">seuemail@email.com</a>
+    </p>
+</section>
+
+<footer>
+    © 2026 • Desenvolvido por você
+</footer>
+
+</body>
+</html>
