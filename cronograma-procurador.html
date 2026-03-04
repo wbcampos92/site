@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Procurador"/>
+<title>Cronograma · Procurador</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
+body{font-family:Georgia,serif;background:#0D1117;color:#E8E0D5;min-height:100vh;padding-bottom:60px;}
+button{cursor:pointer;font-family:inherit;border:none;background:transparent;}
+.header{background:linear-gradient(135deg,#1a1f2e,#0d1117);border-bottom:1px solid #2A3140;padding:50px 16px 14px;}
+.header-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.accent-bar{width:4px;height:34px;background:#C8973A;border-radius:2px;flex-shrink:0;}
+.header-info{flex:1;}
+.eyebrow{font-size:10px;letter-spacing:3px;color:#C8973A;text-transform:uppercase;margin-bottom:3px;}
+.title{font-size:17px;font-weight:bold;color:#F0E8D8;}
+.pct-badge{text-align:center;background:#13192A;border:1px solid #2A3140;border-radius:10px;padding:8px 12px;}
+.pct-num{font-size:20px;font-weight:bold;line-height:1;}
+.pct-label{font-size:9px;color:#6B7280;letter-spacing:1px;margin-top:2px;}
+.progress-bar-wrap{height:4px;background:#1A2030;border-radius:2px;overflow:hidden;}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#C8973A,#6FCF97);border-radius:2px;transition:width 0.4s;}
+.progress-text{font-size:10px;color:#4B5563;margin-top:4px;}
+.tabs{display:flex;border-bottom:1px solid #2A3140;background:#0D1117;position:sticky;top:0;z-index:100;}
+.tab-btn{flex:1;padding:13px 4px;font-size:13px;color:#8892A4;border-bottom:2px solid transparent;transition:all 0.2s;}
+.tab-btn.active{color:#C8973A;border-bottom:2px solid #C8973A;}
+.content{padding:14px;}
+.phase-badge{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:9px 11px;background:#1A1F2E;border-radius:8px;}
+.phase-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.phase-label{font-size:11px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;}
+.week-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px;}
+.week-btn{padding:7px 3px;border-radius:7px;border:1px solid #2A3140;background:#13192A;color:#8892A4;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all 0.15s;}
+.week-btn.active{font-weight:bold;}
+.week-btn.done{border-color:#6FCF9944;background:#0d1a0d;color:#6FCF97;}
+.mini-bar-wrap{width:22px;height:3px;background:#1A2030;border-radius:2px;overflow:hidden;}
+.mini-bar-fill{height:100%;border-radius:2px;}
+.week-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.week-title{font-size:15px;font-weight:bold;color:#F0E8D8;}
+.week-count{font-size:12px;color:#8892A4;}
+.subject-card{border-radius:10px;overflow:hidden;margin-bottom:9px;border:1px solid #2A3140;background:#13192A;transition:all 0.2s;}
+.subject-card.all-done{background:#0f1a12;border-color:#6FCF9933;}
+.subject-header{width:100%;display:flex;align-items:center;gap:11px;padding:12px 13px;text-align:left;color:#E8E0D5;}
+.subject-icon{width:33px;height:33px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.subject-name{font-size:14px;font-weight:bold;color:#F0E8D8;}
+.subject-name.done{color:#6FCF97;}
+.subject-preview{font-size:11px;color:#6B7280;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dots{display:flex;gap:4px;flex-shrink:0;}
+.dot{width:8px;height:8px;border-radius:50%;background:#2A3140;border:1px solid #3A4050;transition:all 0.2s;}
+.chevron{font-size:13px;margin-left:5px;flex-shrink:0;transition:transform 0.2s;}
+.activities{padding:0 13px 13px;display:flex;flex-direction:column;gap:8px;}
+.activity{border-radius:8px;padding:10px 11px;transition:all 0.2s;}
+.activity-inner{display:flex;align-items:flex-start;gap:9px;}
+.activity-body{flex:1;}
+.activity-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+.activity-text{font-size:13px;color:#C8C0B0;line-height:1.6;}
+.activity-text.checked{color:#556655;text-decoration:line-through;}
+.check-btn{flex-shrink:0;width:34px;height:34px;border-radius:8px;border:2px solid #3A4050;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold;color:transparent;transition:all 0.2s;margin-top:2px;}
+.check-btn.checked{border-color:#6FCF97;background:#6FCF97;color:#0a160a;}
+.phase-card{border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.phase-header{padding:13px 14px;display:flex;flex-direction:column;gap:8px;}
+.phase-title-row{display:flex;align-items:center;gap:10px;}
+.phase-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:14px;flex-shrink:0;}
+.phase-prog-row{display:flex;align-items:center;gap:8px;}
+.phase-prog-bar{flex:1;height:5px;background:#0D1117;border-radius:3px;overflow:hidden;}
+.phase-prog-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+.phase-prog-text{font-size:11px;color:#6B7280;}
+.week-chips{padding:11px 14px;display:flex;flex-wrap:wrap;gap:5px;}
+.week-chip{padding:5px 9px;border-radius:6px;font-size:11px;font-family:Georgia,serif;}
+.weight-bar-wrap{height:6px;background:#1A1F2E;border-radius:3px;overflow:hidden;}
+.weight-bar-fill{height:100%;border-radius:3px;}
+.info-box{padding:14px;background:#13192A;border:1px solid #2A3140;border-radius:10px;margin-top:6px;}
+.info-title{font-size:10px;color:#C8973A;letter-spacing:2px;text-transform:uppercase;margin-bottom:11px;}
+.day-row{display:flex;align-items:center;gap:10px;padding:12px 13px;border-radius:10px;margin-bottom:7px;}
+.day-bar{width:4px;height:34px;border-radius:2px;flex-shrink:0;}
+.day-label{width:65px;font-size:13px;font-weight:bold;}
+.method-item{display:flex;gap:10px;margin-bottom:12px;}
+.method-icon{font-size:18px;}
+.method-title{font-size:13px;font-weight:bold;color:#F0E8D8;margin-bottom:3px;}
+.method-desc{font-size:12px;color:#8892A4;line-height:1.6;}
+.weight-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="accent-bar"></div>
+    <div class="header-info">
+      <div class="eyebrow">FAFIPA · Concurso Público</div>
+      <div class="title">Cronograma · Procurador Municipal</div>
+    </div>
+    <div class="pct-badge">
+      <div class="pct-num" id="gPct">0%</div>
+      <div class="pct-label">FEITO</div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="gBar" style="width:0%"></div>
+  </div>
+  <div class="progress-text" id="gText">0 de 300 atividades concluídas</div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('semana',this)">📅 Semana</button>
+  <button class="tab-btn" onclick="switchTab('fases',this)">🗺️ Fases</button>
+  <button class="tab-btn" onclick="switchTab('rotina',this)">🕐 Rotina</button>
+</div>
+
+<div class="content">
+  <div id="tab-semana"></div>
+  <div id="tab-fases" style="display:none"></div>
+  <div id="tab-rotina" style="display:none"></div>
+</div>
+
+<script>
+const phases=[
+  {id:1,label:"Fase 1",name:"Fundamentos",weeks:[1,2,3,4,5],color:"#C8973A"},
+  {id:2,label:"Fase 2",name:"Aprofundamento",weeks:[6,7,8,9,10],color:"#4A7FA5"},
+  {id:3,label:"Fase 3",name:"Temas Avançados",weeks:[11,12,13,14,15],color:"#6A4FA5"},
+  {id:4,label:"Fase 4",name:"Revisão Final",weeks:[16,17,18,19,20],color:"#A54A4A"},
+];
+const subjects={
+  constitucional:{label:"Dir. Constitucional",color:"#2E86AB",icon:"⚖️"},
+  administrativo:{label:"Dir. Administrativo",color:"#A23B72",icon:"🏛️"},
+  processo:{label:"Processo Civil",color:"#F18F01",icon:"📋"},
+  tributario:{label:"Dir. Tributário",color:"#C73E1D",icon:"💰"},
+  financeiro:{label:"Dir. Financeiro",color:"#3B8C6E",icon:"📊"},
+};
+const ACT=["lei","questoes","revisao"];
+const actMeta=[
+  {key:"lei",icon:"📖",label:"Leitura da Lei / Doutrina",bg:"#1a2a1a",border:"#2a4a2a",color:"#6FCF97"},
+  {key:"questoes",icon:"✏️",label:"Resolução de Questões",bg:"#1a1a2a",border:"#2a2a4a",color:"#7B9FE8"},
+  {key:"revisao",icon:"🔁",label:"Revisão de Erros",bg:"#2a1a1a",border:"#4a2a2a",color:"#E87B7B"},
+];
+const WD={
+  1:{theme:"Introdução Geral",constitucional:{lei:"Art. 1º–11 CF — Princípios Fundamentais",questoes:"15 questões FAFIPA sobre princípios constitucionais",revisao:"Mapear dúvidas nos direitos fundamentais"},administrativo:{lei:"Lei 9.784/99 — Princípios do Dir. Administrativo",questoes:"15 questões sobre princípios administrativos",revisao:"Fichamento dos princípios com exemplos práticos"},processo:{lei:"Art. 1º–12 CPC — Normas Fundamentais",questoes:"10 questões sobre normas gerais do processo",revisao:"Comparativo CPC/CF nos princípios processuais"},tributario:{lei:"Art. 1º–5º CTN — Sistema Tributário Nacional",questoes:"10 questões sobre conceito e espécies tributárias",revisao:"Tabela comparativa das espécies tributárias"},financeiro:{lei:"Lei 4.320/64 Art. 1º–20 — Princípios Orçamentários",questoes:"10 questões sobre princípios orçamentários",revisao:"Mapa mental dos princípios orçamentários"}},
+  2:{theme:"Direitos e Garantias",constitucional:{lei:"Art. 5º CF — Direitos e Garantias Fundamentais",questoes:"20 questões sobre direitos fundamentais (FAFIPA)",revisao:"Lista dos remédios constitucionais e cabimento"},administrativo:{lei:"Lei 8.666/93 e 14.133/21 — Licitações",questoes:"20 questões sobre licitações e contratos",revisao:"Tabela comparativa Lei 8.666 x 14.133"},processo:{lei:"Art. 17–69 CPC — Partes e Litisconsórcio",questoes:"15 questões sobre partes e terceiros",revisao:"Esquema de intervenção de terceiros"},tributario:{lei:"Art. 6º–15 CTN — Competência Tributária",questoes:"15 questões sobre competência tributária",revisao:"Mapa de competências (União/Estado/Município)"},financeiro:{lei:"Lei 4.320/64 Art. 21–70 — Receita Pública",questoes:"10 questões sobre receita pública",revisao:"Fluxograma dos estágios da receita"}},
+  3:{theme:"Organização do Estado",constitucional:{lei:"Art. 18–36 CF — Organização e Competências",questoes:"20 questões sobre federalismo e competências",revisao:"Tabela: competências privativas x comuns x concorrentes"},administrativo:{lei:"DL 200/67 — Organização da Adm. Pública Federal",questoes:"15 questões sobre adm. direta e indireta",revisao:"Comparativo: autarquias, fundações, EP e SEM"},processo:{lei:"Art. 70–187 CPC — Competência e Cooperação",questoes:"15 questões sobre competência processual",revisao:"Critérios de fixação de competência"},tributario:{lei:"Art. 16–76 CTN — ISS, IPTU, ITBI (foco municipal)",questoes:"20 questões sobre tributos municipais",revisao:"Tabela de tributos municipais e base de cálculo"},financeiro:{lei:"Lei 4.320/64 Art. 71–100 — Despesa Pública",questoes:"10 questões sobre despesa pública",revisao:"Fluxograma dos estágios da despesa"}},
+  4:{theme:"Poderes e Atos",constitucional:{lei:"Art. 37–43 CF — Administração Pública e Princípios",questoes:"20 questões sobre administração pública na CF",revisao:"Fichamento: concurso, nepotismo, improbidade"},administrativo:{lei:"Lei 9.784/99 — Processo Administrativo",questoes:"20 questões sobre atos e processo administrativo",revisao:"Mapa de atributos dos atos administrativos"},processo:{lei:"Art. 188–293 CPC — Atos Processuais e Prazos",questoes:"15 questões sobre atos processuais",revisao:"Tabela de prazos processuais importantes"},tributario:{lei:"Art. 77–138 CTN — Taxas, Contribuição de Melhoria e Lançamento",questoes:"15 questões sobre espécies e lançamento",revisao:"Tipos de lançamento: ofício, declaração, homologação"},financeiro:{lei:"LC 101/2000 (LRF) — Art. 1º–24",questoes:"15 questões sobre LRF",revisao:"Mapa conceitual dos limites da LRF"}},
+  5:{theme:"Revisão da Fase 1",constitucional:{lei:"Revisão: art. 1º–43 CF — pontos marcados",questoes:"25 questões mistas de constitucional",revisao:"Lista de erros + criação de flashcards"},administrativo:{lei:"Revisão: princípios, licitações, atos e processo",questoes:"25 questões mistas de administrativo",revisao:"Lista de erros + criação de flashcards"},processo:{lei:"Revisão: normas fundamentais, partes, competência",questoes:"20 questões mistas de processo civil",revisao:"Lista de erros + criação de flashcards"},tributario:{lei:"Revisão: competência, impostos, taxas e lançamento",questoes:"20 questões mistas de tributário",revisao:"Lista de erros + criação de flashcards"},financeiro:{lei:"Revisão: receita, despesa e LRF",questoes:"15 questões mistas de financeiro",revisao:"Lista de erros + criação de flashcards"}},
+  6:{theme:"Jurisprudência I",constitucional:{lei:"Art. 44–91 CF — Poder Legislativo",questoes:"20 questões sobre poder legislativo e imunidades",revisao:"Esquema do processo legislativo"},administrativo:{lei:"Lei 8.429/92 — Improbidade Administrativa (Lei 14.230/21)",questoes:"20 questões sobre improbidade",revisao:"Tabela de atos de improbidade e sanções"},processo:{lei:"Art. 294–380 CPC — Tutelas Provisórias",questoes:"15 questões sobre tutelas provisórias",revisao:"Tutela de urgência x evidência"},tributario:{lei:"Art. 139–218 CTN — Crédito Tributário",questoes:"20 questões sobre crédito tributário",revisao:"Suspensão, extinção e exclusão do crédito"},financeiro:{lei:"LRF Art. 25–59 — Transferências e Dívida",questoes:"15 questões sobre LRF avançado",revisao:"Limites de gastos com pessoal"}},
+  7:{theme:"Poder Executivo e Controle",constitucional:{lei:"Art. 76–91 CF + Art. 70–75 CF",questoes:"20 questões sobre poder executivo e TCU",revisao:"Competências privativas do Presidente"},administrativo:{lei:"Lei 8.112/90 — Servidores Públicos Federais",questoes:"25 questões sobre servidores públicos",revisao:"Estabilidade, disponibilidade, PAD e demissão"},processo:{lei:"Art. 381–484 CPC — Extinção do Processo",questoes:"15 questões sobre extinção do processo",revisao:"Hipóteses com e sem resolução do mérito"},tributario:{lei:"Art. 175–225 CTN — Exclusão, Garantias e Preferências",questoes:"15 questões sobre garantias e preferências",revisao:"Hierarquia de preferências no crédito tributário"},financeiro:{lei:"Lei 4.320/64 — Créditos Adicionais e Balanços",questoes:"15 questões sobre créditos adicionais",revisao:"Crédito suplementar, especial e extraordinário"}},
+  8:{theme:"Poder Judiciário e Controle",constitucional:{lei:"Art. 92–126 CF — Poder Judiciário",questoes:"20 questões sobre poder judiciário",revisao:"Competências do STF x STJ x TRF"},administrativo:{lei:"Lei 12.527/11 (LAI) + Lei 13.709/18 (LGPD)",questoes:"15 questões sobre LAI e transparência",revisao:"Prazos e hipóteses de sigilo na LAI"},processo:{lei:"Art. 485–512 CPC — Sentença e Coisa Julgada",questoes:"20 questões sobre sentença e coisa julgada",revisao:"Limites objetivos e subjetivos da coisa julgada"},tributario:{lei:"Art. 194–218 CTN — Administração Tributária",questoes:"20 questões sobre execução fiscal (Lei 6.830/80)",revisao:"Fases da execução fiscal e embargos"},financeiro:{lei:"Lei 10.028/2000 — Crimes contra LRF",questoes:"10 questões sobre responsabilidade fiscal",revisao:"Sanções por descumprimento da LRF"}},
+  9:{theme:"Controle Constitucional",constitucional:{lei:"Art. 102–103 CF — ADI, ADC, ADPF, ADO",questoes:"25 questões sobre controle de constitucionalidade",revisao:"Quadro comparativo das ações constitucionais"},administrativo:{lei:"Lei 9.637/98 (OS) + Lei 9.790/99 (OSCIP)",questoes:"15 questões sobre parcerias e terceiro setor",revisao:"OS x OSCIP x OSC (Lei 13.019/14)"},processo:{lei:"Art. 513–770 CPC — Cumprimento de Sentença",questoes:"20 questões sobre cumprimento de sentença",revisao:"Prazos e multas no cumprimento de sentença"},tributario:{lei:"Revisão jurisprudencial STJ/STF tributária",questoes:"25 questões de tributário com jurisprudência",revisao:"Súmulas vinculantes e STJ em tributário"},financeiro:{lei:"Lei 8.666/93 Art. 1–30 — perspectiva financeira",questoes:"15 questões sobre contratações e orçamento",revisao:"Empenho, liquidação e pagamento"}},
+  10:{theme:"Revisão da Fase 2",constitucional:{lei:"Revisão: poderes e controle de constitucionalidade",questoes:"30 questões — simulado FAFIPA fase 2",revisao:"Correção detalhada + atualização dos flashcards"},administrativo:{lei:"Revisão: improbidade, servidores, LAI",questoes:"30 questões — simulado FAFIPA fase 2",revisao:"Correção detalhada + atualização dos flashcards"},processo:{lei:"Revisão: tutelas, sentença e cumprimento",questoes:"25 questões — simulado FAFIPA fase 2",revisao:"Correção detalhada + atualização dos flashcards"},tributario:{lei:"Revisão: crédito tributário e execução fiscal",questoes:"25 questões — simulado FAFIPA fase 2",revisao:"Correção detalhada + atualização dos flashcards"},financeiro:{lei:"Revisão: LRF, receita, despesa e contratações",questoes:"20 questões — simulado FAFIPA fase 2",revisao:"Correção detalhada + atualização dos flashcards"}},
+  11:{theme:"Temas Avançados I",constitucional:{lei:"Art. 127–135 CF — MP, Advocacia Pública, Defensoria",questoes:"20 questões sobre funções essenciais à justiça",revisao:"Papel do Procurador Municipal — base constitucional"},administrativo:{lei:"Bens Públicos (CC 98–103) + Desapropriação (DL 3.365/41)",questoes:"20 questões sobre bens e desapropriação",revisao:"Classificação dos bens públicos"},processo:{lei:"Art. 771–925 CPC — Execução: teoria geral",questoes:"20 questões sobre execução civil",revisao:"Espécies de execução e meios executivos"},tributario:{lei:"LC 116/2003 — ISS: fato gerador, base de cálculo",questoes:"25 questões sobre ISS (foco municipal!)",revisao:"Lista de serviços tributáveis pelo ISS"},financeiro:{lei:"CF Art. 165–169 — PPA, LDO, LOA e emendas",questoes:"20 questões sobre orçamento público",revisao:"Ciclo orçamentário e hierarquia das leis"}},
+  12:{theme:"Temas Avançados II",constitucional:{lei:"Art. 150–162 CF — Sistema Tributário na CF",questoes:"20 questões sobre limitações ao poder de tributar",revisao:"Imunidades tributárias recíprocas e condicionadas"},administrativo:{lei:"Lei 11.079/04 — PPP + Concessões (Lei 8.987/95)",questoes:"20 questões sobre concessões e parcerias",revisao:"Concessão comum x PPP (patrocinada e administrativa)"},processo:{lei:"Art. 926–1.044 CPC — Recursos",questoes:"20 questões sobre recursos (apelação, agravo, REsp, RE)",revisao:"Requisitos de admissibilidade dos recursos"},tributario:{lei:"CTN — IPTU e ITBI: aspectos municipais avançados",questoes:"20 questões sobre IPTU e ITBI (FAFIPA)",revisao:"Progressividade do IPTU e imunidade do ITBI"},financeiro:{lei:"Decreto 93.872/86 — Execução Orçamentária",questoes:"15 questões sobre execução orçamentária",revisao:"RAP e limitação de empenho"}},
+  13:{theme:"Casos Práticos",constitucional:{lei:"Casos práticos: mandado de segurança, ACP",questoes:"20 questões discursivas e objetivas",revisao:"Elaboração de peças constitucionais"},administrativo:{lei:"Casos práticos: licitação irregular, improbidade, PAD",questoes:"20 questões com situações concretas",revisao:"Estrutura de pareceres administrativos"},processo:{lei:"Art. 1.045–1.072 CPC — Processos Especiais",questoes:"20 questões sobre processos especiais",revisao:"Ação de consignação, monitória e possessórias"},tributario:{lei:"Casos práticos: lançamento, impugnação, recurso",questoes:"20 questões sobre processo adm. tributário",revisao:"Fases do PAF no município"},financeiro:{lei:"Casos práticos: execução orçamentária, RAP",questoes:"15 questões sobre execução financeira municipal",revisao:"Relatório de Gestão Fiscal — análise prática"}},
+  14:{theme:"Jurisprudência Avançada",constitucional:{lei:"Informativos STF — temas municipais relevantes",questoes:"25 questões baseadas em jurisprudência do STF",revisao:"Fichas de jurisprudência por tema"},administrativo:{lei:"Informativos STJ — licitações, servidores (2022–2024)",questoes:"25 questões baseadas em jurisprudência do STJ",revisao:"Fichas de jurisprudência STJ por tema"},processo:{lei:"Jurisprudência STJ em processo civil",questoes:"20 questões de processo com jurisprudência",revisao:"Súmulas do STJ em processo civil"},tributario:{lei:"Jurisprudência STJ/STF em ISS, IPTU, ITBI",questoes:"20 questões de tributário municipal",revisao:"Fichas de jurisprudência tributária municipal"},financeiro:{lei:"TCE/TCU — controle de contas municipais",questoes:"15 questões sobre controle externo municipal",revisao:"Competência do TCE vs TCM nos municípios"}},
+  15:{theme:"Revisão da Fase 3",constitucional:{lei:"Revisão integral: pontos de maior incidência FAFIPA",questoes:"35 questões — simulado temático de constitucional",revisao:"Ranking de erros + reestudo dos temas críticos"},administrativo:{lei:"Revisão integral: pontos de maior incidência FAFIPA",questoes:"35 questões — simulado temático de administrativo",revisao:"Ranking de erros + reestudo dos temas críticos"},processo:{lei:"Revisão integral: pontos de maior incidência FAFIPA",questoes:"30 questões — simulado temático de processo civil",revisao:"Ranking de erros + reestudo dos temas críticos"},tributario:{lei:"Revisão integral: pontos de maior incidência FAFIPA",questoes:"30 questões — simulado temático de tributário",revisao:"Ranking de erros + reestudo dos temas críticos"},financeiro:{lei:"Revisão integral: pontos de maior incidência FAFIPA",questoes:"25 questões — simulado temático de financeiro",revisao:"Ranking de erros + reestudo dos temas críticos"}},
+  16:{theme:"Simulado Completo I",constitucional:{lei:"Releitura das anotações e flashcards",questoes:"Simulado completo 1 — 120 questões",revisao:"Correção e análise por matéria"},administrativo:{lei:"Releitura das anotações e flashcards",questoes:"Simulado completo 1 — 120 questões",revisao:"Identificar as 3 matérias com mais erros"},processo:{lei:"Releitura das anotações e flashcards",questoes:"Simulado completo 1 — 120 questões",revisao:"Plano de ataque aos pontos fracos"},tributario:{lei:"Releitura das anotações e flashcards",questoes:"Simulado completo 1 — 120 questões",revisao:"Fichas de revisão rápida"},financeiro:{lei:"Releitura das anotações e flashcards",questoes:"Simulado completo 1 — 120 questões",revisao:"Fichas de revisão rápida"}},
+  17:{theme:"Reforço por Matéria",constitucional:{lei:"Reestudo dos temas errados no simulado 1",questoes:"30 questões focadas nos erros",revisao:"Atualização das fichas de revisão"},administrativo:{lei:"Reestudo dos temas errados no simulado 1",questoes:"30 questões focadas nos erros",revisao:"Atualização das fichas de revisão"},processo:{lei:"Reestudo dos temas errados no simulado 1",questoes:"25 questões focadas nos erros",revisao:"Atualização das fichas de revisão"},tributario:{lei:"Reestudo dos temas errados no simulado 1",questoes:"25 questões focadas nos erros",revisao:"Atualização das fichas de revisão"},financeiro:{lei:"Reestudo dos temas errados no simulado 1",questoes:"20 questões focadas nos erros",revisao:"Atualização das fichas de revisão"}},
+  18:{theme:"Simulado Completo II",constitucional:{lei:"Revisão rápida: CF, Lei 9.784/99, CTN, CPC",questoes:"Simulado completo 2 — 120 questões cronometrado",revisao:"Comparativo: Simulado 1 x 2"},administrativo:{lei:"Revisão rápida: Lei 8.429/92, 8.112/90, 14.133/21",questoes:"Simulado completo 2 — 120 questões cronometrado",revisao:"Identificar evolução e pontos críticos"},processo:{lei:"Revisão rápida: títulos, recursos, tutelas",questoes:"Simulado completo 2 — 120 questões cronometrado",revisao:"Refinar gestão do tempo"},tributario:{lei:"Revisão rápida: CTN, LC 116/2003, execução fiscal",questoes:"Simulado completo 2 — 120 questões cronometrado",revisao:"Revisão dos erros recorrentes"},financeiro:{lei:"Revisão rápida: LRF, Lei 4.320/64, orçamento",questoes:"Simulado completo 2 — 120 questões cronometrado",revisao:"Revisão dos erros recorrentes"}},
+  19:{theme:"Memorização Final",constitucional:{lei:"Revisão dos flashcards — método ativo",questoes:"20 questões rápidas de alta incidência",revisao:"Treino de redação constitucional"},administrativo:{lei:"Revisão dos flashcards — método ativo",questoes:"20 questões rápidas de alta incidência",revisao:"Treino de elaboração de parecer"},processo:{lei:"Revisão dos flashcards — método ativo",questoes:"20 questões rápidas de alta incidência",revisao:"Revisão de prazos e procedimentos críticos"},tributario:{lei:"Revisão dos flashcards — método ativo",questoes:"20 questões rápidas de alta incidência",revisao:"Revisão de súmulas e jurisprudência"},financeiro:{lei:"Revisão dos flashcards — método ativo",questoes:"20 questões rápidas de alta incidência",revisao:"Revisão dos conceitos orçamentários chave"}},
+  20:{theme:"Véspera de Prova",constitucional:{lei:"Leitura leve das fichas — sem novas informações",questoes:"10 questões de aquecimento (fáceis)",revisao:"Descanso mental, revisão de estratégia"},administrativo:{lei:"Leitura leve das fichas — sem novas informações",questoes:"10 questões de aquecimento (fáceis)",revisao:"Descanso mental, revisão de estratégia"},processo:{lei:"Leitura leve das fichas — sem novas informações",questoes:"10 questões de aquecimento (fáceis)",revisao:"Descanso mental, revisão de estratégia"},tributario:{lei:"Leitura leve das fichas — sem novas informações",questoes:"10 questões de aquecimento (fáceis)",revisao:"Descanso mental, revisão de estratégia"},financeiro:{lei:"Leitura leve das fichas — sem novas informações",questoes:"10 questões de aquecimento (fáceis)",revisao:"Descanso mental, revisão de estratégia"}},
+};
+
+// ── STATE ──────────────────────────────────────────────────────────
+let currentWeek=1;
+let expandedSubject=null;
+let prog={};
+try{const s=localStorage.getItem("proc_v3");if(s)prog=JSON.parse(s);}catch(_){}
+
+function mk(w,s,a){return `w${w}_${s}_${a}`;}
+function save(){try{localStorage.setItem("proc_v3",JSON.stringify(prog));}catch(_){}}
+function wProg(w){let d=0;for(const s of Object.keys(subjects))for(const a of ACT)if(prog[mk(w,s,a)])d++;return d;}
+function totalDone(){return Object.values(prog).filter(Boolean).length;}
+
+// ── GLOBAL PROGRESS ─────────────────────────────────────────────────
+function updateGlobal(){
+  const done=totalDone(),total=300,pct=Math.round((done/total)*100);
+  document.getElementById("gPct").textContent=pct+"%";
+  document.getElementById("gPct").style.color=pct===100?"#6FCF97":"#C8973A";
+  document.getElementById("gBar").style.width=pct+"%";
+  document.getElementById("gText").textContent=`${done} de ${total} atividades concluídas`;
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  ["semana","fases","rotina"].forEach(t=>{
+    document.getElementById("tab-"+t).style.display=t===id?"block":"none";
+  });
+  if(id==="semana")renderSemana();
+  if(id==="fases")renderFases();
+  if(id==="rotina")renderRotina();
+}
+
+// ── SEMANA TAB ───────────────────────────────────────────────────────
+function renderSemana(){
+  const wd=WD[currentWeek];
+  const phase=phases.find(p=>p.weeks.includes(currentWeek));
+  const done=wProg(currentWeek),total=15,pct=Math.round((done/total)*100);
+
+  let html=``;
+
+  // phase badge
+  if(phase) html+=`<div class="phase-badge" style="border:1px solid ${phase.color}33">
+    <div class="phase-dot" style="background:${phase.color}"></div>
+    <span class="phase-label" style="color:${phase.color}">${phase.label} — ${phase.name}</span>
+  </div>`;
+
+  // week grid
+  html+=`<div class="week-grid">`;
+  for(let w=1;w<=20;w++){
+    const ph=phases.find(p=>p.weeks.includes(w));
+    const d=wProg(w),isDone=d===15,isActive=w===currentWeek;
+    const pBar=Math.round((d/15)*100);
+    let cls="week-btn"+(isActive?" active":"")+(isDone?" done":"");
+    let style=`border:${isActive?`2px solid ${ph?.color||"#C8973A"}`:`1px solid ${isDone?"#6FCF9944":"#2A3140"}`};`;
+    style+=`background:${isActive?`${ph?.color}22`:isDone?"#0d1a0d":"#13192A"};`;
+    style+=`color:${isActive?ph?.color||"#C8973A":isDone?"#6FCF97":"#8892A4"};`;
+    html+=`<button class="${cls}" style="${style}" onclick="selectWeek(${w})">
+      <span>${isDone?"✓":w}</span>
+      <div class="mini-bar-wrap"><div class="mini-bar-fill" style="width:${pBar}%;background:${isDone?"#6FCF97":ph?.color||"#C8973A"}"></div></div>
+    </button>`;
+  }
+  html+=`</div>`;
+
+  // week title
+  html+=`<div class="week-header">
+    <div class="week-title">Sem. ${currentWeek} — <span style="color:${phase?.color||"#C8973A"}">${wd?.theme}</span></div>
+    <div class="week-count">${done}/15</div>
+  </div>`;
+
+  // subject cards
+  for(const [key,subj] of Object.entries(subjects)){
+    const data=wd?.[key];
+    const subjDone=ACT.filter(a=>prog[mk(currentWeek,key,a)]).length;
+    const allDone=subjDone===3;
+    const isExp=expandedSubject===key;
+
+    html+=`<div class="subject-card${allDone?" all-done":""}" id="card-${key}">
+      <button class="subject-header" onclick="toggleSubject('${key}')">
+        <div class="subject-icon" style="background:${allDone?"#6FCF9722":subj.color+"22"};${allDone?"border:1.5px solid #6FCF97":""}">
+          ${allDone?"✅":subj.icon}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="subject-name${allDone?" done":""}">${subj.label}</div>
+          ${!isExp&&data?`<div class="subject-preview">${data.lei}</div>`:""}
+        </div>
+        <div class="dots">
+          ${actMeta.map(m=>{const c=!!prog[mk(currentWeek,key,m.key)];return`<div class="dot" style="${c?`background:${m.color};border-color:${m.color}`:""}"></div>`;}).join("")}
+        </div>
+        <div class="chevron" style="color:${subj.color}">${isExp?"▲":"▼"}</div>
+      </button>`;
+
+    if(isExp&&data){
+      html+=`<div class="activities">`;
+      for(const item of actMeta){
+        const checked=!!prog[mk(currentWeek,key,item.key)];
+        html+=`<div class="activity" style="background:${checked?"#0a160a":item.bg};border:1px solid ${checked?"#6FCF9744":item.border}">
+          <div class="activity-inner">
+            <div class="activity-body">
+              <div class="activity-label" style="color:${checked?"#6FCF97":item.color}">${item.icon} ${item.label}</div>
+              <div class="activity-text${checked?" checked":""}">${data[item.key]}</div>
+            </div>
+            <button class="check-btn${checked?" checked":""}" onclick="toggleItem(${currentWeek},'${key}','${item.key}')">✓</button>
+          </div>
+        </div>`;
+      }
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  }
+
+  document.getElementById("tab-semana").innerHTML=html;
+}
+
+function selectWeek(w){
+  currentWeek=w;
+  expandedSubject=null;
+  renderSemana();
+}
+
+function toggleSubject(key){
+  expandedSubject=expandedSubject===key?null:key;
+  renderSemana();
+}
+
+function toggleItem(w,s,a){
+  const k=mk(w,s,a);
+  prog[k]=!prog[k];
+  save();
+  updateGlobal();
+  renderSemana();
+  // also refresh fases if visible
+  if(document.getElementById("tab-fases").style.display!=="none")renderFases();
+}
+
+// ── FASES TAB ────────────────────────────────────────────────────────
+function renderFases(){
+  let html=`<div style="font-size:15px;font-weight:bold;color:#F0E8D8;margin-bottom:4px">Visão Geral das 4 Fases</div>
+  <div style="font-size:12px;color:#6B7280;margin-bottom:14px">Clique em uma semana para navegar.</div>`;
+
+  for(const ph of phases){
+    const phItems=ph.weeks.length*15;
+    const phDone=ph.weeks.reduce((a,w)=>a+wProg(w),0);
+    const phPct=Math.round((phDone/phItems)*100);
+    html+=`<div class="phase-card" style="border:1px solid ${ph.color}44;background:#13192A">
+      <div class="phase-header" style="border-bottom:1px solid ${ph.color}22">
+        <div class="phase-title-row">
+          <div class="phase-icon" style="background:${ph.color}22;color:${ph.color}">F${ph.id}</div>
+          <div>
+            <div style="font-size:14px;font-weight:bold;color:${ph.color}">${ph.label} — ${ph.name}</div>
+            <div style="font-size:11px;color:#8892A4">Semanas ${ph.weeks[0]}–${ph.weeks[ph.weeks.length-1]}</div>
+          </div>
+        </div>
+        <div class="phase-prog-row">
+          <div class="phase-prog-bar"><div class="phase-prog-fill" style="width:${phPct}%;background:${phPct===100?"#6FCF97":ph.color}"></div></div>
+          <span class="phase-prog-text">${phDone}/${phItems} · ${phPct}%</span>
+        </div>
+      </div>
+      <div class="week-chips">
+        ${ph.weeks.map(w=>{
+          const d=wProg(w),c=d===15;
+          return`<button class="week-chip" onclick="goWeek(${w})" style="background:${c?"#0d1a0d":ph.color+"11"};border:1px solid ${c?"#6FCF9744":ph.color+"44"};color:${c?"#6FCF97":ph.color}">${c?"✓ ":""}S${w} — ${WD[w]?.theme}</button>`;
+        }).join("")}
+      </div>
+    </div>`;
+  }
+
+  // weight bars
+  const weights={constitucional:90,administrativo:85,processo:75,tributario:80,financeiro:65};
+  html+=`<div class="info-box"><div class="info-title">🎯 Pesos Estimados — FAFIPA</div>`;
+  for(const [k,s] of Object.entries(subjects)){
+    html+=`<div class="weight-row">
+      <div style="width:120px;font-size:12px;color:#C8C0B0">${s.label}</div>
+      <div class="weight-bar-wrap" style="flex:1"><div class="weight-bar-fill" style="width:${weights[k]}%;background:${s.color}"></div></div>
+      <div style="font-size:11px;color:#6B7280;width:30px">${weights[k]}%</div>
+    </div>`;
+  }
+  html+=`<div style="font-size:10px;color:#4B5563;margin-top:8px">* Estimativa baseada em editais anteriores da FAFIPA.</div></div>`;
+
+  document.getElementById("tab-fases").innerHTML=html;
+}
+
+function goWeek(w){
+  currentWeek=w;
+  expandedSubject=null;
+  document.querySelectorAll(".tab-btn").forEach((b,i)=>{b.classList.toggle("active",i===0);});
+  document.getElementById("tab-semana").style.display="block";
+  document.getElementById("tab-fases").style.display="none";
+  document.getElementById("tab-rotina").style.display="none";
+  renderSemana();
+}
+
+// ── ROTINA TAB ───────────────────────────────────────────────────────
+function renderRotina(){
+  const days=[
+    {day:"Segunda",subj:"constitucional",hrs:"06h–08h / 19h–21h"},
+    {day:"Terça",subj:"administrativo",hrs:"06h–08h / 19h–21h"},
+    {day:"Quarta",subj:"processo",hrs:"06h–08h / 19h–21h"},
+    {day:"Quinta",subj:"tributario",hrs:"06h–08h / 19h–21h"},
+    {day:"Sexta",subj:"financeiro",hrs:"06h–08h / 19h–21h"},
+    {day:"Sábado",subj:null,hrs:"Descanso"},
+    {day:"Domingo",subj:null,hrs:"08h–12h"},
+  ];
+  let html=`<div style="font-size:15px;font-weight:bold;color:#F0E8D8;margin-bottom:4px">Rotina Semanal</div>
+  <div style="font-size:12px;color:#6B7280;margin-bottom:14px">3h por dia · lei, questões e revisão de erros.</div>`;
+
+  for(const {day,subj,hrs} of days){
+    const s=subj?subjects[subj]:null;
+    const isSab=day==="Sábado",isDom=day==="Domingo";
+    html+=`<div class="day-row" style="background:${isSab?"#0D1117":"#13192A"};border:1px solid ${isSab?"#2A3140":s?s.color+"44":"#3A4A60"};opacity:${isSab?0.45:1}">
+      <div class="day-label" style="color:${isSab?"#4B5563":"#F0E8D8"}">${day}</div>
+      <div class="day-bar" style="background:${s?s.color:isDom?"#C8973A":"#2A3140"}"></div>
+      <div style="flex:1">`;
+    if(s){html+=`<div style="font-size:13px;font-weight:bold;color:${s.color}">${s.label}</div>
+        <div style="font-size:10px;color:#8892A4;margin-top:2px">📖 Lei · ✏️ Questões · 🔁 Revisão</div>`;}
+    else if(isDom){html+=`<div style="font-size:13px;font-weight:bold;color:#C8973A">Revisão Geral + Simulado</div>
+        <div style="font-size:10px;color:#8892A4;margin-top:2px">🔁 Revisão · ✏️ Simulado · 📊 Análise</div>`;}
+    else{html+=`<div style="font-size:13px;color:#4B5563">Descanso 😴</div>`;}
+    html+=`</div><div style="font-size:10px;color:#6B7280">${hrs}</div></div>`;
+  }
+
+  html+=`<div class="info-box"><div class="info-title">💡 Como estudar cada bloco</div>
+  ${[
+    {icon:"📖",t:"Leitura da Lei (1h)",d:"Leia com marcações. Para cada artigo: O que regula? Qual a consequência? Existe exceção?"},
+    {icon:"✏️",t:"Questões (1h30)",d:"Resolva questões FAFIPA. Leia sempre o gabarito comentado — inclusive nas certas."},
+    {icon:"🔁",t:"Revisão de Erros (30min)",d:"Anote cada erro: tema, motivo (distração/desconhecimento/pegadinha) e a regra correta."},
+  ].map(item=>`<div class="method-item">
+    <div class="method-icon">${item.icon}</div>
+    <div><div class="method-title">${item.t}</div><div class="method-desc">${item.d}</div></div>
+  </div>`).join("")}</div>`;
+
+  document.getElementById("tab-rotina").innerHTML=html;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────
+updateGlobal();
+renderSemana();
+</script>
+</body>
+</html>
