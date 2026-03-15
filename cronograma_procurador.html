@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cronograma Procurador – Washinghton</title>
+<style>
+:root {
+  --const:#3B82F6; --const-bg:#EFF6FF; --const-bd:#BFDBFE;
+  --admin:#8B5CF6; --admin-bg:#F5F3FF; --admin-bd:#DDD6FE;
+  --proc:#F59E0B;  --proc-bg:#FFFBEB;  --proc-bd:#FDE68A;
+  --trib:#10B981;  --trib-bg:#ECFDF5;  --trib-bd:#A7F3D0;
+  --afo:#EF4444;   --afo-bg:#FEF2F2;   --afo-bd:#FECACA;
+  --bg:#F1F5F9; --surface:#fff; --border:#E2E8F0;
+  --text:#1E293B; --muted:#64748B; --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);}
+
+.header{background:linear-gradient(135deg,#1E3A5F,#2D6A9F);color:#fff;padding:22px 20px 18px;text-align:center;}
+.header h1{font-size:1.5rem;font-weight:800;}
+.header h1 em{opacity:.6;font-style:normal;font-weight:400;font-size:.95rem;}
+.header p{font-size:.8rem;opacity:.72;margin-top:4px;}
+.badges{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+.badge{background:rgba(255,255,255,.15);border-radius:20px;padding:3px 10px;font-size:.73rem;}
+
+.config-bar{background:#fff;border-bottom:1px solid var(--border);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.config-bar label{font-size:.8rem;color:var(--muted);}
+.config-bar input[type=date]{border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.82rem;}
+.btn-reset{margin-left:auto;cursor:pointer;border-radius:6px;border:1px solid var(--border);background:#F8FAFC;font-size:.77rem;padding:4px 11px;color:var(--muted);}
+.btn-reset:hover{background:#E2E8F0;}
+
+.overview{padding:12px 18px 4px;display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:7px;max-width:1000px;margin:0 auto;}
+.mat-card{border-radius:8px;padding:9px 11px;border:1px solid var(--border);background:var(--surface);}
+.mat-card .mc-name{font-size:.73rem;font-weight:700;margin-bottom:4px;}
+.mat-card .mc-bar{height:5px;border-radius:3px;background:#E2E8F0;overflow:hidden;margin-bottom:3px;}
+.mat-card .mc-fill{height:100%;border-radius:3px;transition:width .4s;}
+.mat-card .mc-pct{font-size:.68rem;color:var(--muted);}
+
+.semanas{padding:0 14px 50px;max-width:1000px;margin:0 auto;}
+.semana{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);margin-bottom:7px;overflow:hidden;}
+.s-prog{height:3px;background:#E2E8F0;}
+.s-prog-fill{height:100%;background:#22C55E;transition:width .4s;}
+.s-hdr{display:flex;align-items:center;gap:9px;padding:11px 15px;cursor:pointer;user-select:none;transition:background .15s;}
+.s-hdr:hover{background:#F8FAFC;}
+.s-num{font-size:.7rem;color:var(--muted);font-weight:700;min-width:52px;}
+.s-tema{font-size:.83rem;font-weight:600;flex:1;}
+.s-data{font-size:.7rem;color:var(--muted);white-space:nowrap;}
+.s-pct{font-size:.7rem;color:var(--muted);min-width:32px;text-align:right;}
+.chevron{font-size:.63rem;color:var(--muted);transition:transform .25s;}
+.semana.open .chevron{transform:rotate(180deg);}
+.s-body{display:none;border-top:1px solid var(--border);}
+.semana.open .s-body{display:block;}
+
+/* Lei seca da semana */
+.lei-bar{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);background:#FAFAFA;}
+.lei-cell{padding:6px 9px;border-right:1px solid var(--border);}
+.lei-cell:last-child{border-right:none;}
+.lei-mat{font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px;}
+.lei-txt{font-size:.65rem;color:var(--muted);line-height:1.35;}
+@media(max-width:600px){.lei-bar{grid-template-columns:1fr;}.lei-cell{border-right:none;border-bottom:1px solid var(--border);}}
+
+/* Dias */
+.dias-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+@media(max-width:720px){.dias-grid{grid-template-columns:1fr;}}
+.dia{border-right:1px solid var(--border);padding:7px 6px 9px;min-width:0;}
+.dia:last-child{border-right:none;}
+.d-hdr{margin-bottom:5px;}
+.d-nome{font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+.d-data{font-size:.64rem;color:#94A3B8;}
+.d-total{font-size:.63rem;color:var(--muted);text-align:right;margin-top:5px;}
+
+/* Subject block */
+.sb{border-radius:5px;border:1px solid transparent;margin-bottom:4px;overflow:hidden;}
+.sb:last-child{margin-bottom:0;}
+.sb-lbl{display:flex;align-items:center;gap:3px;padding:3px 5px;font-size:.61rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;}
+.sb-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.sb-const{background:var(--const-bg);border-color:var(--const-bd);}
+.sb-const .sb-lbl{color:var(--const);}
+.sb-const .sb-dot{background:var(--const);}
+.sb-admin{background:var(--admin-bg);border-color:var(--admin-bd);}
+.sb-admin .sb-lbl{color:var(--admin);}
+.sb-admin .sb-dot{background:var(--admin);}
+.sb-proc{background:var(--proc-bg);border-color:var(--proc-bd);}
+.sb-proc .sb-lbl{color:var(--proc);}
+.sb-proc .sb-dot{background:var(--proc);}
+.sb-trib{background:var(--trib-bg);border-color:var(--trib-bd);}
+.sb-trib .sb-lbl{color:var(--trib);}
+.sb-trib .sb-dot{background:var(--trib);}
+.sb-afo{background:var(--afo-bg);border-color:var(--afo-bd);}
+.sb-afo .sb-lbl{color:var(--afo);}
+.sb-afo .sb-dot{background:var(--afo);}
+.sb-sim{background:#FFF1F2;border-color:#FECDD3;}
+.sb-sim .sb-lbl{color:#9F1239;}
+.sb-sim .sb-dot{background:#E11D48;}
+.sb-mix{background:#F0FDF4;border-color:#BBF7D0;}
+.sb-mix .sb-lbl{color:#166534;}
+.sb-mix .sb-dot{background:#16A34A;}
+
+/* Atividades */
+.atv{display:flex;align-items:flex-start;gap:4px;padding:3px 5px;cursor:pointer;border-top:1px solid rgba(0,0,0,.05);}
+.atv:first-of-type{border-top:none;}
+.atv input{margin-top:2px;flex-shrink:0;width:11px;height:11px;cursor:pointer;}
+.atv label{font-size:.66rem;line-height:1.3;cursor:pointer;flex:1;}
+.atv .mn{font-size:.6rem;font-weight:600;opacity:.6;white-space:nowrap;padding-left:2px;}
+.atv.done{opacity:.38;}
+.atv.done label{text-decoration:line-through;}
+.at-lei label{color:#1D4ED8;}
+.at-teoria label{color:#6D28D9;}
+.at-quest label{color:#065F46;}
+.at-rev label{color:#0E7490;}
+.at-sim label{color:#9F1239;}
+
+/* Descanso */
+.dia-dsc{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px 5px;background:#F8FAFC;min-height:110px;}
+.dsc-icon{font-size:1.5rem;margin-bottom:4px;}
+.dsc-lbl{font-size:.7rem;font-weight:700;color:#64748B;}
+.dsc-sub{font-size:.63rem;color:#94A3B8;margin-top:3px;font-style:italic;line-height:1.4;}
+
+/* Legenda */
+.legenda{display:flex;gap:8px;flex-wrap:wrap;padding:7px 13px;border-bottom:1px solid var(--border);background:#FAFAFA;}
+.lg-i{display:flex;align-items:center;gap:3px;font-size:.65rem;color:var(--muted);}
+.lg-dot{width:7px;height:7px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Washinghton <em>· Cronograma Procurador Municipal · FAFIPA</em></h1>
+  <p>5 Matérias todo dia (Seg–Qui) · Sexta = Revisão · Sábado = Dia de Guarda · Domingo = Simulado · 3h/dia · 20 Semanas</p>
+  <div class="badges">
+    <div class="badge">📖 Lei Seca</div>
+    <div class="badge">🧠 Teoria</div>
+    <div class="badge">❓ Questões</div>
+    <div class="badge">🔄 Revisão Anki</div>
+    <div class="badge">🕍 Sábado Sagrado</div>
+    <div class="badge">🎯 Domingo = Simulado</div>
+  </div>
+</div>
+
+<div class="config-bar">
+  <label>📅 Início (segunda-feira):</label>
+  <input type="date" id="dataInicio">
+  <button class="btn-reset" onclick="resetProgress()">🗑 Zerar progresso</button>
+</div>
+
+<div class="overview" id="overview"></div>
+
+<div style="padding:0 14px;max-width:1000px;margin:0 auto 5px">
+  <div class="legenda">
+    <div class="lg-i"><div class="lg-dot" style="background:#1D4ED8"></div>Lei Seca (Seg/Qua)</div>
+    <div class="lg-i"><div class="lg-dot" style="background:#6D28D9"></div>Teoria (Seg/Ter)</div>
+    <div class="lg-i"><div class="lg-dot" style="background:#065F46"></div>Questões (Ter/Qua/Qui)</div>
+    <div class="lg-i"><div class="lg-dot" style="background:#0E7490"></div>Revisão Anki (Qui/Sex)</div>
+    <div class="lg-i"><div class="lg-dot" style="background:#9F1239"></div>Simulado (Dom)</div>
+  </div>
+</div>
+
+<div class="semanas" id="semanas"></div>
+
+<script>
+const MAT = {
+  const:{nome:'D. Constitucional', cor:'#3B82F6', cls:'sb-const'},
+  admin:{nome:'D. Administrativo',  cor:'#8B5CF6', cls:'sb-admin'},
+  proc: {nome:'D. Proc. Civil',     cor:'#F59E0B', cls:'sb-proc'},
+  trib: {nome:'D. Tributário',      cor:'#10B981', cls:'sb-trib'},
+  afo:  {nome:'AFO / D. Financeiro',cor:'#EF4444', cls:'sb-afo'},
+};
+const MKS = ['const','admin','proc','trib','afo'];
+const DOFF = {seg:0,ter:1,qua:2,qui:3,sex:4,sab:5,dom:6};
+const DNAMES = {seg:'Segunda',ter:'Terça',qua:'Quarta',qui:'Quinta',sex:'Sexta',sab:'Sábado',dom:'Domingo'};
+
+const W = [
+/*1*/{g:'Fundamentos e Introdução Geral',
+  const:{t:'Teoria Constitucional + Poder Constituinte',l:'CF/88 Arts. 1-4, 59-69 | ADCT Arts. 1-10'},
+  admin:{t:'Introdução + Regime Jurídico Administrativo',l:'CF/88 Art. 37 | LINDB Arts. 20-30'},
+  proc: {t:'Normas Fundamentais do CPC + Aplicação das Normas',l:'CPC Arts. 1-15'},
+  trib: {t:'Conceito de Tributo + Espécies Tributárias',l:'CTN Arts. 1-15 | CF/88 Arts. 145-149-B'},
+  afo:  {t:'Introdução + Conceito e Natureza do Orçamento Público',l:'CF/88 Arts. 165-169 | Lei 4.320/64 Arts. 1-8'},
+},
+/*2*/{g:'Princípios Gerais',
+  const:{t:'Constituição: Conceito, Classificação, Supremacia e Eficácia das Normas',l:'CF/88 Art. 60 | ADCT'},
+  admin:{t:'Princípios Expressos (LIMPE) e Implícitos da Administração',l:'Lei 9.784/99 Arts. 1-3 | CF/88 Art. 37 caput'},
+  proc: {t:'Jurisdição + Ação + Condições da Ação',l:'CPC Arts. 16-20'},
+  trib: {t:'Limitações Constitucionais ao Poder de Tributar',l:'CF/88 Arts. 150-152 | CTN Arts. 9-11'},
+  afo:  {t:'Princípios Orçamentários',l:'Lei 4.320/64 Arts. 2-9 | CF/88 Art. 165 §§1-9'},
+},
+/*3*/{g:'Competência e Elementos',
+  const:{t:'Direitos Fundamentais I – Art. 5º (incisos I-XL)',l:'CF/88 Art. 5º incisos I-XL'},
+  admin:{t:'Atos Administrativos I – Conceito, Elementos e Atributos',l:'Lei 9.784/99 Arts. 48-56'},
+  proc: {t:'Competência Interna I – Critérios, Absoluta e Relativa',l:'CPC Arts. 42-53'},
+  trib: {t:'Competência Tributária – Conceitos, Características e Repartição',l:'CTN Arts. 6-15 | CF/88 Arts. 153-156'},
+  afo:  {t:'PPA + LDO',l:'CF/88 Art. 165 §§1-2 | Lei 4.320/64 Arts. 15-17'},
+},
+/*4*/{g:'Atos, Modificação e Instrumentos Orçamentários',
+  const:{t:'Direitos Fundamentais II – Art. 5º (incisos XLI-LXXVIII) + Remédios Constitucionais',l:'CF/88 Art. 5º incisos XLI-LXXVIII'},
+  admin:{t:'Atos Administrativos II – Espécies, Classificação e Desfazimento',l:'Lei 9.784/99 Arts. 53-65'},
+  proc: {t:'Competência Interna II – Modificação, Prorrogação e Conflito de Competência',l:'CPC Arts. 54-69'},
+  trib: {t:'Repartição de Competência + Impostos Municipais (ISS, IPTU, ITBI)',l:'CF/88 Arts. 156-162 | CTN Arts. 32-34'},
+  afo:  {t:'LOA + Vedações Orçamentárias (Art. 167 CF)',l:'CF/88 Art. 165 §5-9, Art. 167 | Lei 4.320/64 Arts. 18-28'},
+},
+/*5*/{g:'Sujeitos, Poderes e Instrumentos',
+  const:{t:'Direitos Sociais + Direitos dos Trabalhadores (Arts. 6-11 CF)',l:'CF/88 Arts. 6-11'},
+  admin:{t:'Poderes da Administração – Vinculado, Discricionário, Hierárquico, Disciplinar, Polícia',l:'CF/88 Art. 5º XIII-XVI | Art. 84'},
+  proc: {t:'Partes – Capacidade Processual + Deveres das Partes e Procuradores',l:'CPC Arts. 70-112'},
+  trib: {t:'Legislação Tributária – Fontes, Vigência, Interpretação e Integração',l:'CTN Arts. 96-112 | CF/88 Arts. 146-146-A'},
+  afo:  {t:'Créditos Adicionais + Ciclo Orçamentário',l:'Lei 4.320/64 Arts. 40-46 | CF/88 Art. 167 V'},
+},
+/*6*/{g:'Organização, Litisconsórcio e Obrigação Tributária',
+  const:{t:'Nacionalidade + Direitos Políticos + Organização do Estado (Arts. 12-24)',l:'CF/88 Arts. 12-16, 18-24'},
+  admin:{t:'Organização Administrativa – Direta, Indireta, Descentralização e Agências',l:'Dec.-Lei 200/67 Arts. 1-6 | Lei 13.848/19'},
+  proc: {t:'Litisconsórcio – Classificação, Formação e Multitudinário',l:'CPC Arts. 113-118'},
+  trib: {t:'Obrigação Tributária + Fato Gerador (Arts. 113-118 CTN)',l:'CTN Arts. 113-123'},
+  afo:  {t:'Receita Pública I – Conceito e Classificação por Natureza',l:'Lei 4.320/64 Arts. 51-73 | MCASP'},
+},
+/*7*/{g:'Administração Pública, Terceiros e Crédito Tributário',
+  const:{t:'Administração Pública – Arts. 37-41 CF (Princípios, Concurso, Nepotismo, Estabilidade)',l:'CF/88 Arts. 37-41'},
+  admin:{t:'Servidores Públicos – Lei 8.112/90 Parte I: Provimento, Vacância, Estabilidade, Remuneração',l:'Lei 8.112/90 Arts. 1-47'},
+  proc: {t:'Intervenção de Terceiros – Assistência, Denunciação, Chamamento, Amicus Curiae',l:'CPC Arts. 119-138'},
+  trib: {t:'Sujeito Passivo + Responsabilidade Tributária',l:'CTN Arts. 124-138'},
+  afo:  {t:'Receita Pública II – Estágios, Fonte/Destinação de Recursos e Dívida Ativa',l:'Lei 4.320/64 Arts. 51-73'},
+},
+/*8*/{g:'Poderes da República, Juiz e Lançamento',
+  const:{t:'Poder Legislativo + Processo Legislativo (Arts. 44-75 CF)',l:'CF/88 Arts. 44-75'},
+  admin:{t:'Servidores Públicos – Lei 8.112/90 Parte II: Deveres, Proibições e Regime Disciplinar',l:'Lei 8.112/90 Arts. 116-142'},
+  proc: {t:'Juiz + Auxiliares da Justiça + MP + Advocacia Pública + Defensoria',l:'CPC Arts. 139-187'},
+  trib: {t:'Crédito Tributário – Conceito + Lançamento (3 espécies)',l:'CTN Arts. 139-150'},
+  afo:  {t:'Despesa Pública I – Conceito e Classificação Orçamentária',l:'Lei 4.320/64 Arts. 12-45 | MCASP'},
+},
+/*9*/{g:'Atos Processuais, Poder Executivo e Suspensão',
+  const:{t:'Poder Executivo + Poder Judiciário + Funções Essenciais à Justiça (Arts. 76-135)',l:'CF/88 Arts. 76-91, 92-135'},
+  admin:{t:'Bens Públicos + Responsabilidade Civil do Estado',l:'CC Arts. 98-103 | CF/88 Art. 37 §6'},
+  proc: {t:'Atos Processuais – Forma, Tempo, Lugar + Citação e Intimação',l:'CPC Arts. 188-275'},
+  trib: {t:'Suspensão + Extinção do Crédito Tributário',l:'CTN Arts. 151-174'},
+  afo:  {t:'Despesa Pública II – Estágios (Empenho/Liquidação/Pagamento), RAP, DEA, Suprimento de Fundos',l:'Lei 4.320/64 Arts. 58-70'},
+},
+/*10*/{g:'Tutela Provisória, Controle Constitucional e LRF I',
+  const:{t:'Sistema Tributário Nacional na CF (Arts. 145-162) + Controle de Constitucionalidade',l:'CF/88 Arts. 145-162, 97, 102-103-A'},
+  admin:{t:'Processo Administrativo – Lei 9.784/99 (Completa)',l:'Lei 9.784/99 completa'},
+  proc: {t:'Nulidades + Tutela Provisória – Urgência (Antecipada/Cautelar) e Evidência',l:'CPC Arts. 276-311'},
+  trib: {t:'Exclusão do Crédito Tributário (Isenção e Anistia)',l:'CTN Arts. 175-182'},
+  afo:  {t:'LRF I – Disposições Preliminares + Planejamento Orçamentário (Arts. 1-10)',l:'LC 101/2000 Arts. 1-10'},
+},
+/*11*/{g:'Procedimento Comum, Licitações e LRF II',
+  const:{t:'Revisão – Teoria Constitucional + Direitos Fundamentais (Semanas 1-4)',l:'CF/88 Arts. 1-17 (revisão)'},
+  admin:{t:'Licitações – Lei 14.133/2021 Parte I: Modalidades, Instrução e Fases',l:'Lei 14.133/2021 Arts. 1-55'},
+  proc: {t:'Procedimento Comum I – Petição Inicial + Resposta do Réu + Revelia',l:'CPC Arts. 319-351'},
+  trib: {t:'Administração Tributária – Fiscalização + Dívida Ativa + Certidão Negativa',l:'CTN Arts. 194-208'},
+  afo:  {t:'LRF II – Receita + Renúncia de Receita + Despesas com Pessoal (Arts. 11-24)',l:'LC 101/2000 Arts. 11-24'},
+},
+/*12*/{g:'Saneamento, Contratos Administrativos e LRF III',
+  const:{t:'Revisão – Organização do Estado + Art. 37-41 + Poder Legislativo (Semanas 5-7)',l:'CF/88 Arts. 18-75 (revisão)'},
+  admin:{t:'Licitações – Lei 14.133/2021 Parte II: Contratação Direta + Contratos Administrativos',l:'Lei 14.133/2021 Arts. 72-154'},
+  proc: {t:'Procedimento Comum II – Audiência de Conciliação + Saneamento + Provas',l:'CPC Arts. 334-484'},
+  trib: {t:'Lei de Execução Fiscal – Lei 6.830/80 Parte I: Competência, Penhora, Citação',l:'Lei 6.830/80 Arts. 1-25'},
+  afo:  {t:'LRF III – Dívida Pública + Operações de Crédito + Garantias (Arts. 29-42)',l:'LC 101/2000 Arts. 29-42'},
+},
+/*13*/{g:'Sentença, Sanções Administrativas e LRF IV',
+  const:{t:'Revisão – Poder Executivo + Poder Judiciário + Funções Essenciais (Semanas 8-9)',l:'CF/88 Arts. 76-135 (revisão)'},
+  admin:{t:'Lei 14.133/2021 – Sanções + Irregularidades + Disposições Gerais (Arts. 155-194)',l:'Lei 14.133/2021 Arts. 155-194'},
+  proc: {t:'Sentença + Coisa Julgada + Remessa Necessária',l:'CPC Arts. 485-512'},
+  trib: {t:'Lei de Execução Fiscal – Lei 6.830/80 Parte II: Embargos à Execução + Extinção',l:'Lei 6.830/80 Arts. 16-40'},
+  afo:  {t:'LRF IV – Transparência + Controle + Fiscalização (Arts. 43-75)',l:'LC 101/2000 Arts. 43-75'},
+},
+/*14*/{g:'Cumprimento de Sentença, STN e Repartição de Receitas',
+  const:{t:'Revisão – STN na CF + Controle de Constitucionalidade (Semanas 9-10)',l:'CF/88 Arts. 145-162, ADI/ADC/ADPF (revisão)'},
+  admin:{t:'Revisão Geral D. Administrativo – Princípios, Atos, Poderes, Organização, Servidores',l:'D. Admin completo (revisão)'},
+  proc: {t:'Cumprimento de Sentença – Provisório e Definitivo (Pagar, Fazer, Entregar)',l:'CPC Arts. 513-538'},
+  trib: {t:'Processo Administrativo Tributário + Revisão Geral D. Tributário',l:'CTN completo (revisão)'},
+  afo:  {t:'Repartição Constitucional de Receitas + Tópicos Finais Lei 4.320/64',l:'CF/88 Arts. 157-162 | Lei 4.320/64 (revisão)'},
+},
+/*15*/{g:'Processo de Execução e Revisão Intensiva',
+  const:{t:'Questões Intensivas – D. Constitucional (mix de todos os temas)',l:'CF/88 revisão geral'},
+  admin:{t:'Questões Intensivas – D. Administrativo (foco nos temas de maior erro)',l:'D. Admin revisão geral'},
+  proc: {t:'Processo de Execução – Partes, Título Executivo, Responsabilidade Patrimonial, Penhora',l:'CPC Arts. 771-909'},
+  trib: {t:'Questões Intensivas – D. Tributário (foco nos temas de maior erro)',l:'CTN + LEF revisão geral'},
+  afo:  {t:'Questões Intensivas – AFO (foco nos temas de maior erro)',l:'LRF + Lei 4.320/64 revisão geral'},
+},
+/*16*/{g:'Embargos, Revisão por Blocos',
+  const:{t:'Revisão por Bloco – Direitos Fundamentais: Art. 5º + Remédios + Sociais',l:'CF/88 Arts. 5-11 (revisão aprofundada)'},
+  admin:{t:'Revisão por Bloco – Atos + Poderes + Organização + Servidores',l:'Atos, Poderes, Organização (revisão)'},
+  proc: {t:'Embargos à Execução + Execução contra Fazenda Pública + Suspensão/Extinção da Execução',l:'CPC Arts. 910-925'},
+  trib: {t:'Revisão por Bloco – Obrigação + Crédito + Extinção + Exclusão',l:'CTN Arts. 113-182 (revisão aprofundada)'},
+  afo:  {t:'Revisão por Bloco – Receita + Despesa + Créditos Adicionais',l:'Lei 4.320/64 (revisão aprofundada)'},
+},
+/*17*/{g:'Processos nos Tribunais e Revisão LRF',
+  const:{t:'Revisão por Bloco – Organização do Estado + Art. 37 + Poderes da República',l:'CF/88 Arts. 18-135 (revisão aprofundada)'},
+  admin:{t:'Revisão por Bloco – Responsabilidade Civil + Processo Admin + Licitações e Contratos',l:'Lei 9.784/99 + Lei 14.133/2021 (revisão)'},
+  proc: {t:'Processos nos Tribunais – Ação Rescisória + IRDR + Reclamação',l:'CPC Arts. 966-993'},
+  trib: {t:'Revisão por Bloco – Competência Tributária + Legislação + STN + Execução Fiscal',l:'CF/88 Arts. 145-162 + CTN + LEF (revisão)'},
+  afo:  {t:'Revisão por Bloco – LRF Completa (Arts. 1-75)',l:'LC 101/2000 completa (revisão aprofundada)'},
+},
+/*18*/{g:'Recursos e Revisão Geral',
+  const:{t:'Revisão Geral – D. Constitucional (foco em questões de alto índice de erro)',l:'CF/88 completa (revisão final)'},
+  admin:{t:'Revisão Geral – D. Administrativo (foco em questões de alto índice de erro)',l:'D. Admin completo (revisão final)'},
+  proc: {t:'Recursos – Disposições Gerais + Apelação + Agravo de Instrumento + Agravo Interno',l:'CPC Arts. 994-1021'},
+  trib: {t:'Revisão Geral – D. Tributário (foco em questões de alto índice de erro)',l:'CTN + LEF (revisão final)'},
+  afo:  {t:'Revisão Geral – AFO / D. Financeiro (foco em questões de alto índice de erro)',l:'LRF + Lei 4.320/64 (revisão final)'},
+},
+/*19*/{g:'Simulados por Matéria + Embargos/RE/REsp',
+  const:{t:'Simulado por Matéria – D. Constitucional (30 questões estilo FAFIPA)',l:'Revisão flash – CF/88 artigos mais cobrados'},
+  admin:{t:'Simulado por Matéria – D. Administrativo (30 questões estilo FAFIPA)',l:'Revisão flash – D. Admin artigos mais cobrados'},
+  proc: {t:'Recursos – Embargos de Declaração + RE e REsp + Jurisprudência STF/STJ',l:'CPC Arts. 1022-1044'},
+  trib: {t:'Simulado por Matéria – D. Tributário (25 questões estilo FAFIPA)',l:'Revisão flash – CTN artigos mais cobrados'},
+  afo:  {t:'Simulado por Matéria – AFO (25 questões estilo FAFIPA)',l:'Revisão flash – LRF + Lei 4.320/64 artigos mais cobrados'},
+},
+/*20*/{g:'Semana Final – Consolidação e Simulado Final',
+  const:{t:'Revisão Leve + Anki – D. Constitucional (não sobrecarregar, manter confiança)',l:'Flash review – CF/88 artigos-chave'},
+  admin:{t:'Revisão Leve + Anki – D. Administrativo (não sobrecarregar, manter confiança)',l:'Flash review – D. Admin artigos-chave'},
+  proc: {t:'Revisão Geral CPC + Questões Finais + Jurisprudência STF/STJ sobre Processo',l:'CPC completo | Súmulas STJ/STF'},
+  trib: {t:'Revisão Leve + Anki – D. Tributário (não sobrecarregar, manter confiança)',l:'Flash review – CTN artigos-chave'},
+  afo:  {t:'Revisão Leve + Anki – AFO (não sobrecarregar, manter confiança)',l:'Flash review – LRF artigos-chave'},
+},
+];
+
+// ─── GERAÇÃO DE ATIVIDADES ────────────────────────────────────────────────────
+// Seg: lei_seca(14) + teoria(22) = 36min × 5 = 180 ✓
+// Ter: teoria(14) + questoes(22) = 36min × 5 = 180 ✓
+// Qua: lei_seca(12) + questoes(24) = 36min × 5 = 180 ✓
+// Qui: questoes(20) + revisao(16) = 36min × 5 = 180 ✓
+// Sex: revisao(20) × 5 + questoes_mistas(80) = 180 ✓
+// Dom: simulado(120) + revisao(60) = 180 ✓
+function mkAtivs(dk, temaObj) {
+  const {t,l}=temaObj;
+  if(dk==='seg') return [{tp:'lei',d:`Lei Seca: ${l}`,m:14},{tp:'teoria',d:`Teoria: ${t}`,m:22}];
+  if(dk==='ter') return [{tp:'teoria',d:`Teoria/Resumo: ${t}`,m:14},{tp:'quest',d:`Questões FAFIPA: ${t}`,m:22}];
+  if(dk==='qua') return [{tp:'lei',d:`Releitura: ${l}`,m:12},{tp:'quest',d:`Questões: ${t}`,m:24}];
+  if(dk==='qui') return [{tp:'quest',d:`Questões FAFIPA: ${t}`,m:20},{tp:'rev',d:`Revisão Anki: ${t}`,m:16}];
+  return [];
+}
+
+// ─── STORAGE ─────────────────────────────────────────────────────────────────
+const PFX='crono3-';
+function ck(k){return localStorage.getItem(PFX+k)==='1';}
+function setck(k,v){v?localStorage.setItem(PFX+k,'1'):localStorage.removeItem(PFX+k);}
+// Keys: seg/ter/qua/qui: "{sn}-{dk}-{mk}-{i}"  sex: "{sn}-sex-{mk}" / "{sn}-sex-mistas"  dom: "{sn}-dom-{i}"
+function isChkDay(sn,dk,mk,i){return ck(`${sn}-${dk}-${mk}-${i}`);}
+function setChkDay(sn,dk,mk,i,v){setck(`${sn}-${dk}-${mk}-${i}`,v);}
+function isChkSex(sn,mk){return ck(`${sn}-sex-${mk}`);}
+function setChkSex(sn,mk,v){setck(`${sn}-sex-${mk}`,v);}
+function isChkDom(sn,i){return ck(`${sn}-dom-${i}`);}
+function setChkDom(sn,i,v){setck(`${sn}-dom-${i}`,v);}
+
+// ─── PROGRESSO ───────────────────────────────────────────────────────────────
+function cntSem(si){
+  let tot=0,dn=0;
+  const sn=si+1, sem=W[si];
+  ['seg','ter','qua','qui'].forEach(dk=>MKS.forEach(mk=>{
+    mkAtivs(dk,sem[mk]).forEach((_,i)=>{tot++;if(isChkDay(sn,dk,mk,i))dn++;});
+  }));
+  MKS.forEach(mk=>{tot++;if(isChkSex(sn,mk))dn++;});
+  tot++;if(isChkSex(sn,'mistas'))dn++; // questões mistas sexta
+  [0,1].forEach(i=>{tot++;if(isChkDom(sn,i))dn++;});
+  return{tot,dn};
+}
+function cntMat(mk){
+  let tot=0,dn=0;
+  W.forEach((sem,si)=>{
+    const sn=si+1;
+    ['seg','ter','qua','qui'].forEach(dk=>mkAtivs(dk,sem[mk]).forEach((_,i)=>{tot++;if(isChkDay(sn,dk,mk,i))dn++;}));
+    tot++;if(isChkSex(sn,mk))dn++;
+  });
+  return{tot,dn};
+}
+
+// ─── DATAS ───────────────────────────────────────────────────────────────────
+function getIni(){return localStorage.getItem(PFX+'ini')||'';}
+function setIni(v){localStorage.setItem(PFX+'ini',v);}
+function semStart(si){
+  const ini=getIni();if(!ini)return null;
+  const d=new Date(ini+'T00:00:00');d.setDate(d.getDate()+si*7);return d;
+}
+function addD(dt,n){if(!dt)return null;const d=new Date(dt);d.setDate(d.getDate()+n);return d;}
+function fmt(dt){if(!dt)return'';return dt.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});}
+
+// ─── RENDER OVERVIEW ─────────────────────────────────────────────────────────
+function rdrOverview(){
+  let gtot=0,gdn=0;
+  W.forEach((_,i)=>{const c=cntSem(i);gtot+=c.tot;gdn+=c.dn;});
+  const gp=gtot?Math.round(gdn/gtot*100):0;
+  let h=`<div class="mat-card" style="border-color:#64748B33">
+    <div class="mc-name" style="color:#1E293B">📊 Progresso Geral</div>
+    <div class="mc-bar"><div class="mc-fill" style="width:${gp}%;background:#1E3A5F"></div></div>
+    <div class="mc-pct">${gdn}/${gtot} atividades (${gp}%)</div></div>`;
+  MKS.forEach(mk=>{
+    const m=MAT[mk],c=cntMat(mk),p=c.tot?Math.round(c.dn/c.tot*100):0;
+    h+=`<div class="mat-card" style="border-color:${m.cor}33">
+      <div class="mc-name" style="color:${m.cor}">${m.nome}</div>
+      <div class="mc-bar"><div class="mc-fill" style="width:${p}%;background:${m.cor}"></div></div>
+      <div class="mc-pct">${c.dn}/${c.tot} (${p}%)</div></div>`;
+  });
+  document.getElementById('overview').innerHTML=h;
+}
+
+// ─── RENDER ATIVIDADE ─────────────────────────────────────────────────────────
+const TIPO_IC={lei:'📖',teoria:'🧠',quest:'❓',rev:'🔄',sim:'🎯'};
+function rdrAtv(atv, checked, onclk){
+  return `<div class="atv at-${atv.tp}${checked?' done':''}" onclick="${onclk}(this)">
+    <input type="checkbox"${checked?' checked':''} onclick="event.stopPropagation();${onclk}(this.closest('.atv'))">
+    <label>${TIPO_IC[atv.tp]||''} ${atv.d}</label>
+    <span class="mn">${atv.m}min</span>
+  </div>`;
+}
+
+// ─── RENDER DIA MON-THU ──────────────────────────────────────────────────────
+function rdrMonThu(dk,si,startDt){
+  const sem=W[si],sn=si+1,dt=addD(startDt,DOFF[dk]);
+  let totalMin=0;
+  const blocks=MKS.map(mk=>{
+    const ativs=mkAtivs(dk,sem[mk]);
+    const ahtml=ativs.map((a,i)=>{
+      totalMin+=a.m;
+      return rdrAtv(a,isChkDay(sn,dk,mk,i),`tgD('${sn}','${dk}','${mk}',${i})`);
+    }).join('');
+    return`<div class="sb ${MAT[mk].cls}"><div class="sb-lbl"><div class="sb-dot"></div>${MAT[mk].nome}</div>${ahtml}</div>`;
+  }).join('');
+  return`<div class="dia">
+    <div class="d-hdr"><div class="d-nome">${DNAMES[dk]}</div>${dt?`<div class="d-data">${fmt(dt)}</div>`:''}</div>
+    ${blocks}
+    <div class="d-total">⏱ ${totalMin}min</div>
+  </div>`;
+}
+
+// ─── RENDER SEXTA ────────────────────────────────────────────────────────────
+function rdrSex(si,startDt){
+  const sem=W[si],sn=si+1,dt=addD(startDt,DOFF['sex']);
+  const blocks=MKS.map(mk=>{
+    const a={tp:'rev',d:`Revisão: ${sem[mk].t}`,m:20};
+    return`<div class="sb ${MAT[mk].cls}"><div class="sb-lbl"><div class="sb-dot"></div>${MAT[mk].nome}</div>
+      ${rdrAtv(a,isChkSex(sn,mk),`tgSex('${sn}','${mk}')`)}
+    </div>`;
+  }).join('');
+  const mistas={tp:'quest',d:'Questões mistas – todas as matérias (estilo FAFIPA)',m:80};
+  const mixBlock=`<div class="sb sb-mix"><div class="sb-lbl"><div class="sb-dot"></div>Questões Mistas</div>
+    ${rdrAtv(mistas,isChkSex(sn,'mistas'),`tgSex('${sn}','mistas')`)}
+  </div>`;
+  return`<div class="dia">
+    <div class="d-hdr"><div class="d-nome">Sexta</div>${dt?`<div class="d-data">${fmt(dt)}</div>`:''}</div>
+    ${blocks}${mixBlock}
+    <div class="d-total">⏱ 180min</div>
+  </div>`;
+}
+
+// ─── RENDER SÁBADO ───────────────────────────────────────────────────────────
+function rdrSab(startDt){
+  const dt=addD(startDt,DOFF['sab']);
+  return`<div class="dia dia-dsc">
+    <div class="d-hdr"><div class="d-nome">Sábado</div>${dt?`<div class="d-data">${fmt(dt)}</div>`:''}</div>
+    <div class="dsc-icon">🕍</div>
+    <div class="dsc-lbl">Dia de Guarda</div>
+    <div class="dsc-sub">"Seis dias trabalharás,<br>mas o sétimo é sagrado"<br>(Êxodo 20:9-10)</div>
+  </div>`;
+}
+
+// ─── RENDER DOMINGO ──────────────────────────────────────────────────────────
+function rdrDom(si,startDt){
+  const sn=si+1,dt=addD(startDt,DOFF['dom']);
+  const isFinal=si===19;
+  const ativs=isFinal?[
+    {tp:'sim',d:'🎯 SIMULADO FINAL – Todas as matérias (50 questões estilo FAFIPA Procurador Municipal)',m:120},
+    {tp:'rev',d:'Correção analítica + Plano de melhoria por matéria + Anki final',m:60},
+  ]:[
+    {tp:'sim',d:'Simulado/Bloco de questões mistas (estilo FAFIPA)',m:120},
+    {tp:'rev',d:'Correção, revisão de erros + Anki geral',m:60},
+  ];
+  const ahtml=ativs.map((a,i)=>rdrAtv(a,isChkDom(sn,i),`tgDom('${sn}',${i})`)).join('');
+  return`<div class="dia">
+    <div class="d-hdr"><div class="d-nome">Domingo</div>${dt?`<div class="d-data">${fmt(dt)}</div>`:''}</div>
+    <div class="sb sb-sim"><div class="sb-lbl"><div class="sb-dot"></div>Simulado + Revisão</div>${ahtml}</div>
+    <div class="d-total">⏱ 180min</div>
+  </div>`;
+}
+
+// ─── RENDER SEMANA ────────────────────────────────────────────────────────────
+function rdrSemana(si){
+  const sem=W[si],sn=si+1;
+  const{tot,dn}=cntSem(si),pct=tot?Math.round(dn/tot*100):0;
+  const startDt=semStart(si),endDt=addD(startDt,6);
+  const range=(startDt&&endDt)?`${fmt(startDt)} – ${fmt(endDt)}`:'';
+  const leiBar=MKS.map(mk=>`<div class="lei-cell">
+    <div class="lei-mat" style="color:${MAT[mk].cor}">${MAT[mk].nome}</div>
+    <div class="lei-txt">${sem[mk].t}</div>
+  </div>`).join('');
+  const dias=['seg','ter','qua','qui'].map(dk=>rdrMonThu(dk,si,startDt)).join('')+
+    rdrSex(si,startDt)+rdrSab(startDt)+rdrDom(si,startDt);
+  return`<div class="semana" id="sem${sn}">
+    <div class="s-prog"><div class="s-prog-fill" id="fill${sn}" style="width:${pct}%"></div></div>
+    <div class="s-hdr" onclick="tgSem(${sn})">
+      <span class="s-num">Semana ${sn}</span>
+      <span class="s-tema">${sem.g}</span>
+      ${range?`<span class="s-data">${range}</span>`:''}
+      <span class="s-pct" id="pct${sn}">${pct}%</span>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="s-body">
+      <div class="lei-bar">${leiBar}</div>
+      <div class="dias-grid">${dias}</div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  document.getElementById('semanas').innerHTML=W.map((_,i)=>rdrSemana(i)).join('');
+  rdrOverview();
+}
+
+// ─── INTERAÇÕES ───────────────────────────────────────────────────────────────
+function tgSem(n){document.getElementById('sem'+n).classList.toggle('open');}
+
+function _replSem(sn){
+  const si=parseInt(sn)-1;
+  const el=document.getElementById('sem'+sn);
+  if(!el)return;
+  const wasOpen=el.classList.contains('open');
+  const tmp=document.createElement('div');
+  tmp.innerHTML=rdrSemana(si);
+  el.replaceWith(tmp.firstElementChild);
+  if(wasOpen)document.getElementById('sem'+sn).classList.add('open');
+  rdrOverview();
+}
+
+function tgD(sn,dk,mk,idx){
+  setChkDay(sn,dk,mk,idx,!isChkDay(sn,dk,mk,idx));
+  _replSem(sn);
+}
+function tgSex(sn,mk){
+  setChkSex(sn,mk,!isChkSex(sn,mk));
+  _replSem(sn);
+}
+function tgDom(sn,idx){
+  setChkDom(sn,idx,!isChkDom(sn,idx));
+  _replSem(sn);
+}
+
+function resetProgress(){
+  if(!confirm('Zerar todo o progresso? Esta ação não pode ser desfeita.'))return;
+  Object.keys(localStorage).filter(k=>k.startsWith(PFX)).forEach(k=>localStorage.removeItem(k));
+  render();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+const dti=document.getElementById('dataInicio');
+const sv=getIni();if(sv)dti.value=sv;
+dti.addEventListener('change',e=>{setIni(e.target.value);render();});
+render();
+</script>
+</body>
+</html>
